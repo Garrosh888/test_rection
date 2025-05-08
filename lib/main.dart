@@ -29,19 +29,31 @@ class _Game_page extends State<Game_page>{
   double y = 100;
   Timer? timer;
   int points = 0;
+  int milliseconds_ball = 4000;
+  int anti_points = 0;
 
   void add_points(){
     setState(() {
       points++;
+      if(milliseconds_ball>1100){
+        milliseconds_ball-=300;
+      }
     });
+    timer?.cancel();
+    move_circle();
   }
 
   void move_circle(){
     timer?.cancel();
-    timer = Timer.periodic(Duration(milliseconds: 2000), (_){
+    setState(() {
+      x = Random().nextDouble()* (MediaQuery.of(context).size.width);
+      y = Random().nextDouble()* (MediaQuery.of(context).size.height);
+    });
+    timer = Timer.periodic(Duration(milliseconds: milliseconds_ball), (_){
       setState(() {
         x = Random().nextDouble()* (MediaQuery.of(context).size.width);
         y = Random().nextDouble()* (MediaQuery.of(context).size.height);
+        anti_points++;
       });
     });
     
@@ -58,7 +70,7 @@ class _Game_page extends State<Game_page>{
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(// это виджет это вся верхняя часть 
-        title: Text("попади в круг, очки:$points"),
+        title: Text("попади в круг, очки:$points , не попал :$anti_points"),
         centerTitle: true,
         backgroundColor: Colors.pink
       ),
@@ -72,8 +84,19 @@ class _Game_page extends State<Game_page>{
             ),
             if(start_game == false)
             Center(
-              child: ElevatedButton(onPressed: click_start, child: Text("start")),
+              child: ElevatedButton(
+                onPressed: click_start, 
+                child: Text(
+                  "start",
+                  style: TextStyle(color: Colors.yellow,fontSize: 25),
+                  ),
+                style: ElevatedButton.styleFrom(backgroundColor: Colors.blue)
+                  ),
             ),
+            Positioned(
+              bottom: 0,
+              left: 10,
+              child: Text("программа для проверки реакции")),
             if(start_game == true)
             Positioned(
               left: x,
